@@ -1,4 +1,4 @@
-// types.ts 2.2.0-dev @preserve
+// types.ts 3.1.2-dev @preserve
 
 /**
  * https://gridstackjs.com/
@@ -7,7 +7,6 @@
 */
 
 import { GridStack } from './gridstack';
-import { GridStackDD } from './gridstack-dd';
 
 
 /** different layout options when changing # of columns,
@@ -24,6 +23,8 @@ export interface GridItemHTMLElement extends HTMLElement {
   /** @internal */
   _gridstackNodeOrig?: GridStackNode;
 }
+
+export type GridStackElement = string | HTMLElement | GridItemHTMLElement;
 
 /**
  * Defines the options for a Grid
@@ -58,13 +59,14 @@ export interface GridStackOptions {
   /** (internal) unit for cellHeight (default? 'px') which is set when a string cellHeight with a unit is passed (ex: '10rem') */
   cellHeightUnit?: string;
 
+  /** list of children item to create when calling load() or addGrid() */
+  children?: GridStackWidget[];
+
   /** number of columns (default?: 12). Note: IF you change this, CSS also have to change. See https://github.com/gridstack/gridstack.js#change-grid-columns */
   column?: number;
 
-  /** class that implement drag'n'drop functionality for gridstack. If false grid will be static.
-   * (default?: undefined - first available plugin will be used)
-   */
-  ddPlugin?: false | typeof GridStackDD;
+  /** additional class on top of '.grid-stack' (which is required for our CSS) to differentiate this instance */
+  class?: string;
 
   /** disallows dragging of widgets (default?: false) */
   disableDrag?: boolean;
@@ -175,10 +177,10 @@ export interface GridStackOptions {
   /** if `true` will add style element to `<head>` otherwise will add it to element's parent node (default `false`). */
   styleInHead?: boolean;
 
-  /** @internal */
-  _isNested?: boolean;
-  /** @internal */
-  _class?: string;
+  /** @internal point to a parent grid item if we're nested */
+  _isNested?: GridStackNode;
+  /** @internal unique class name for our generated CSS style sheet */
+  _styleSheetClass?: string;
 }
 
 
@@ -191,19 +193,19 @@ export interface GridStackWidget {
   /** widget position y (default?: 0) */
   y?: number;
   /** widget dimension width (default?: 1) */
-  width?: number;
+  w?: number;
   /** widget dimension height (default?: 1) */
-  height?: number;
+  h?: number;
   /** if true then x, y parameters will be ignored and widget will be places on the first available position (default?: false) */
   autoPosition?: boolean;
   /** minimum width allowed during resize/creation (default?: undefined = un-constrained) */
-  minWidth?: number;
+  minW?: number;
   /** maximum width allowed during resize/creation (default?: undefined = un-constrained) */
-  maxWidth?: number;
+  maxW?: number;
   /** minimum height allowed during resize/creation (default?: undefined = un-constrained) */
-  minHeight?: number;
+  minH?: number;
   /** maximum height allowed during resize/creation (default?: undefined = un-constrained) */
-  maxHeight?: number;
+  maxH?: number;
   /** prevent resizing (default?: undefined = un-constrained) */
   noResize?: boolean;
   /** prevents moving (default?: undefined = un-constrained) */
@@ -212,10 +214,12 @@ export interface GridStackWidget {
   locked?: boolean;
   /** widgets can have their own resize handles. For example 'e,w' will make the particular widget only resize east and west. */
   resizeHandles?: string;
-  /** value for `data-gs-id` stored on the widget (default?: undefined) */
+  /** value for `gs-id` stored on the widget (default?: undefined) */
   id?: numberOrString;
   /** html to append inside as content */
   content?: string;
+  /** optional nested grid options and list of children, which then turns into actual instance at runtime */
+  subGrid?: GridStackOptions | GridStack;
 }
 
 /** Drag&Drop resize options */
@@ -253,6 +257,30 @@ export interface DDDragInOpt extends DDDragOpt {
     helper?: string | ((event: Event) => HTMLElement);
 }
 
+export interface Size {
+  width: number;
+  height: number;
+}
+export interface Position {
+  top: number;
+  left: number;
+}
+export interface Rect extends Size, Position {}
+
+/** data that is passed during drag and resizing callbacks */
+export interface DDUIData {
+  position?: Position;
+  size?: Size;
+  /* fields not used by GridStack but sent by jq ? leave in case we go back to them...
+  originalPosition? : Position;
+  offset?: Position;
+  originalSize?: Size;
+  element?: HTMLElement[];
+  helper?: HTMLElement[];
+  originalElement?: HTMLElement[];
+  */
+}
+
 /**
  * internal descriptions describing the items in the grid
  */
@@ -288,9 +316,9 @@ export interface GridStackNode extends GridStackWidget {
   /** @internal */
   _lastTriedY?: number;
   /** @internal */
-  _lastTriedWidth?: number;
+  _lastTriedW?: number;
   /** @internal */
-  _lastTriedHeight?: number;
+  _lastTriedH?: number;
   /** @internal */
   _isAboutToRemove?: boolean;
   /** @internal */

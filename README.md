@@ -42,6 +42,7 @@ Join us on Slack: https://gridstackjs.troolee.com
   - [Migrating to v0.6](#migrating-to-v06)
   - [Migrating to v1](#migrating-to-v1)
   - [Migrating to v2](#migrating-to-v2)
+  - [Migrating to v3](#migrating-to-v3)
 - [jQuery Application](#jquery-application)
 - [Changes](#changes)
 - [The Team](#the-team)
@@ -70,16 +71,27 @@ npm install --save gridstack
 ES6 or Typescript
 
 ```js
-import GridStack from 'gridstack';
 import 'gridstack/dist/gridstack.min.css';
+import GridStack from 'gridstack';
+// THEN to get HTML5 drag&drop
+import 'gridstack/dist/h5/gridstack-dd-native';
+// OR to get legacy jquery-ui drag&drop
+import 'gridstack/dist/jq/gridstack-dd-jqueryui';
+// OR nothing to get static grids (API driven, no user drag&drop)
 ```
-
-alternatively in html
+Alternatively in html
 
 ```html
 <link href="node_modules/gridstack/dist/gridstack.min.css" rel="stylesheet"/>
-<script src="node_modules/gridstack/dist/gridstack.all.js"></script>
+<!-- HTML5 drag&drop (63k) -->
+<script src="node_modules/gridstack/dist/gridstack-h5.js"></script>
+<!-- OR jquery-ui drag&drop (186k) -->
+<script src="node_modules/gridstack/dist/gridstack-jq.js"></script>
+<!-- OR static grid (34k) -->
+<script src="node_modules/gridstack/dist/gridstack-static.js"></script>
 ```
+
+Note: the API is the same, regardless of the plugin (or lack thereof) so you can switch at any time. The Jquery version will export $ that it bundles. Read more at [migrating to v3](#migrating-to-v3)
 
 ## Basic usage
 
@@ -91,7 +103,7 @@ creating items dynamically...
 
 // ...in your script
 var grid = GridStack.init();
-grid.addWidget({width: 2, content: 'item 1'});
+grid.addWidget({w: 2, content: 'item 1'});
 ```
 
 ... or creating from list
@@ -99,8 +111,8 @@ grid.addWidget({width: 2, content: 'item 1'});
 ```js
 // using serialize data instead of .addWidget()
 const serializedData = [
-  {x: 0, y: 0, width: 2, height: 2},
-  {x: 2, y: 3, width: 3, content: 'item 2'},
+  {x: 0, y: 0, w: 2, h: 2},
+  {x: 2, y: 3, w: 3, content: 'item 2'},
   {x: 1, y: 3}
 ];
 
@@ -115,7 +127,7 @@ grid.load(serializedData);
   <div class="grid-stack-item">
     <div class="grid-stack-item-content">Item 1</div>
   </div>
-  <div class="grid-stack-item" data-gs-width="2">
+  <div class="grid-stack-item" gs-w="2">
     <div class="grid-stack-item-content">Item 2 wider</div>
   </div>
 </div>
@@ -128,7 +140,7 @@ see [jsfiddle sample](https://jsfiddle.net/adumesny/jqhkry7g) as running example
 
 ## Requirements
 
-GridStack no longer requires external dependencies as of v1.0.0 (lodash was removed in v0.5.0 and jquery API in v1.0.0). All you need to include is `gridstack.all.js` and `gridstack.min.css` (layouts are done using CSS column based %).
+GridStack no longer requires external dependencies as of v1.0.0 (lodash was removed in v0.5.0 and jquery API in v1.0.0). v3.0.0 is a complete HTML5 re-write which removes all jqeury dependency (still available for legacy apps). All you need to include now is `gridstack-h5.js` and `gridstack.min.css` (layouts are done using CSS column based %).
 
 ## API Documentation
 
@@ -173,30 +185,30 @@ See example: [2 grids demo](http://gridstack.github.io/gridstack.js/demo/two.htm
 
 ## Custom columns CSS
 
-If you need > 12 columns or want to generate the CSS manually you will need to generate CSS rules for `.grid-stack-item[data-gs-width="X"]` and `.grid-stack-item[data-gs-x="X"]`.
+If you need > 12 columns or want to generate the CSS manually you will need to generate CSS rules for `.grid-stack-item[gs-w="X"]` and `.grid-stack-item[gs-x="X"]`.
 
 For instance for 3-column grid you need to rewrite CSS to be:
 
 ```css
-.grid-stack-item[data-gs-width="3"]  { width: 100% }
-.grid-stack-item[data-gs-width="2"]  { width: 66.66666667% }
-.grid-stack-item[data-gs-width="1"]  { width: 33.33333333% }
+.grid-stack-item[gs-w="3"]  { width: 100% }
+.grid-stack-item[gs-w="2"]  { width: 66.66666667% }
+.grid-stack-item[gs-w="1"]  { width: 33.33333333% }
 
-.grid-stack-item[data-gs-x="2"]  { left: 66.66666667% }
-.grid-stack-item[data-gs-x="1"]  { left: 33.33333333% }
+.grid-stack-item[gs-x="2"]  { left: 66.66666667% }
+.grid-stack-item[gs-x="1"]  { left: 33.33333333% }
 ```
 
 For 4-column grid it should be:
 
 ```css
-.grid-stack-item[data-gs-width="4"]  { width: 100% }
-.grid-stack-item[data-gs-width="3"]  { width: 75% }
-.grid-stack-item[data-gs-width="2"]  { width: 50% }
-.grid-stack-item[data-gs-width="1"]  { width: 25% }
+.grid-stack-item[gs-w="4"]  { width: 100% }
+.grid-stack-item[gs-w="3"]  { width: 75% }
+.grid-stack-item[gs-w="2"]  { width: 50% }
+.grid-stack-item[gs-w="1"]  { width: 25% }
 
-.grid-stack-item[data-gs-x="3"]  { left: 75% }
-.grid-stack-item[data-gs-x="2"]  { left: 50% }
-.grid-stack-item[data-gs-x="1"]  { left: 25% }
+.grid-stack-item[gs-x="3"]  { left: 75% }
+.grid-stack-item[gs-x="2"]  { left: 50% }
+.grid-stack-item[gs-x="1"]  { left: 25% }
 ```
 
 and so on.
@@ -211,10 +223,10 @@ Better yet, here is a SASS code snippet which can make life much easier (Thanks 
   min-width: (100% / $gridstack-columns);
 
   @for $i from 1 through $gridstack-columns {
-    &[data-gs-width='#{$i}'] { width: (100% / $gridstack-columns) * $i; }
-    &[data-gs-x='#{$i}'] { left: (100% / $gridstack-columns) * $i; }
-    &[data-gs-min-width='#{$i}'] { min-width: (100% / $gridstack-columns) * $i; }
-    &[data-gs-max-width='#{$i}'] { max-width: (100% / $gridstack-columns) * $i; }
+    &[gs-w='#{$i}'] { width: (100% / $gridstack-columns) * $i; }
+    &[gs-x='#{$i}'] { left: (100% / $gridstack-columns) * $i; }
+    &[gs-min-w='#{$i}'] { min-width: (100% / $gridstack-columns) * $i; }
+    &[gs-max-w='#{$i}'] { max-width: (100% / $gridstack-columns) * $i; }
   }
 }
 ```
@@ -252,7 +264,7 @@ Please use [jQuery UI Touch Punch](https://github.com/furf/jquery-ui-touch-punch
 working on touch-based devices.
 
 ```html
-<script src="gridstack.all.js"></script>
+<script src="gridstack-jq.js"></script>
 <script src="jquery.ui.touch-punch.min.js"></script>
 ```
 **NEW**
@@ -295,12 +307,13 @@ If you're still experiencing issues on touch devices please check [#444](https:/
 
 search for ['gridstack' under NPM](https://www.npmjs.com/search?q=gridstack&ranking=popularity) for latest, more to come...
 
-- Vue.js: see [demo](https://gridstackjs.com/demo/vue3js.html) with [v3 src](https://github.com/gridstack/gridstack.js/blob/develop/demo/vue3js.html) or [v2 src](https://github.com/gridstack/gridstack.js/blob/develop/demo/vue2js.html) 
-- React: see [demo](https://gridstackjs.com/demo/react.html) with [src](https://github.com/gridstack/gridstack.js/blob/develop/demo/react.html), or  [react-gridstack-example](https://github.com/Inder2108/react-gridstack-example/blob/master/src/App.js), or read on what [hooks to use](https://github.com/gridstack/gridstack.js/issues/735#issuecomment-329888796)
-- Ember: [ember-gridstack](https://github.com/yahoo/ember-gridstack)
-- Angular9: [lb-gridstack](https://github.com/pfms84/lb-gridstack) Note: very old v0.3 gridstack instance so recommend for concept ONLY. You can do component or directive. Working on exposing the Angular component wrapper we use internally.
-- AngularJS: [gridstack-angular](https://github.com/kdietrich/gridstack-angular)
-- Rails: [gridstack-js-rails](https://github.com/randoum/gridstack-js-rails)
+- **Angular9**: [lb-gridstack](https://github.com/pfms84/lb-gridstack) Note: very old v0.3 gridstack instance so recommend for concept ONLY. You can do component or directive. Working on exposing the Angular component wrapper we use internally.
+- **AngularJS**: [gridstack-angular](https://github.com/kdietrich/gridstack-angular)
+- **Ember**: [ember-gridstack](https://github.com/yahoo/ember-gridstack)
+- **knockout**: see [demo](https://gridstackjs.com/demo/knockout.html) using component, but check [custom bindings ticket](https://github.com/gridstack/gridstack.js/issues/465) which is likely better approach.
+- **Rails**: [gridstack-js-rails](https://github.com/randoum/gridstack-js-rails)
+- **React**: see [demo](https://gridstackjs.com/demo/react.html) with [src](https://github.com/gridstack/gridstack.js/blob/develop/demo/react.html), or  [react-gridstack-example](https://github.com/Inder2108/react-gridstack-example/blob/master/src/App.js), or read on what [hooks to use](https://github.com/gridstack/gridstack.js/issues/735#issuecomment-329888796)
+- **Vue**: see [demo](https://gridstackjs.com/demo/vue3js.html) with [v3 src](https://github.com/gridstack/gridstack.js/blob/develop/demo/vue3js.html) or [v2 src](https://github.com/gridstack/gridstack.js/blob/develop/demo/vue2js.html)
 
 # Migrating
 ## Migrating to v0.6
@@ -339,6 +352,8 @@ var grid = GridStack.init(opts?, element?);
 
 // returns DOM element
 grid.addWidget('<div><div class="grid-stack-item-content"> test </div></div>', {width: 2});
+// Note: in 3.x it's ever simpler 
+// grid.addWidget({w:2, content: 'test'})
 
 // event handler
 grid.on('added', function(e, items) {/* items contains info */});
@@ -381,14 +396,33 @@ v2 is a Typescript rewrite of 1.x, removing all jquery events, using classes and
 
 **Note:** 2.x no longer support legacy IE11 and older due to using more compact ES6 output and typecsript native code. You will need to stay at 1.x
 
+## Migrating to v3
+
+make sure to read v2 migration first!
+
+v3 has a new HTML5 drag&drop plugging (63k total, all native code), while still allowing you to use the legacy jquery-ui version instead (188k), or a new static grid version (34k, no user drag&drop but full API support). You will need to decide which version to use as `gridstack.all.js` no longer exist (same is now `gridstack-jq.js`) - see [include info](#include).
+
+Note: HTML5 is almost on parity with the old jquery-ui based drag&drop. the `containment` (prevent a child from being dragged outside it's parent) and `revert` (not clear what it for yet) are not yet implemented in initial release of v3.0.0
+
+Breaking changes:
+
+1. include (as mentioned) need to change
+
+2. `GridStack.update(el, opt)` now takes single `GridStackWidget` options instead of only supporting (x,y,w,h) BUT legacy call in JS will continue working the same for now. That method is a complete re-write and does the right constrain and updates now for all the available params.
+
+3. `locked()`, `move()`, `resize()`, `minWidth()`, `minHeight()`, `maxWidth()`, `maxHeight()` methods are hidden from Typescript (JS can still call for now) as they are just 1 liner wrapper around `update(el, opt)` anyway and will go away soon. (ex: `move(el, x, y)` => `update(el, {x, y})`)
+
+4. item attribute like `data-gs-min-width` is now `gs-min-w`. We removed 'data-' from all attributes, and shorten 'width|height' to just 'w|h' to require less typing and more efficient (2k saved in .js alone!).
+
+5. `GridStackWidget` used in most API `width|height|minWidth|minHeight|maxWidth|maxHeight` are now shorter `w|h|minW|minH|maxW|maxH` as well
+
 # jQuery Application
 
-We're working on implementing HTML5 drag'n'drop through the plugin system. Right now it is still jquery-ui based. Because of that we are still bundling `jquery` (3.5.1) + `jquery-ui` (1.12.1 minimal drag|drop|resize) internally in `gridstack.all.js`. IFF your app needs to bring your own version instead, you should **instead** include `gridstack-poly.min.js` (optional IE support) + `gridstack.min.js` + `gridstack.jQueryUI.min.js` after you import your JQ libs. But note that there are issue with jQuery and ES6 import (see [1306](https://github.com/gridstack/gridstack.js/issues/1306)).
+We now have a native HTML5 drag'n'drop through the plugin system (default), but the jquery-ui version can be used instead. It will bundle `jquery` (3.5.1) + `jquery-ui` (1.12.1 minimal drag|drop|resize) in `gridstack-jq.js`. IFF your app needs to bring your own version instead, you should **instead** include `gridstack-poly.min.js` (optional IE support) + `gridstack.min.js` + `gridstack.jQueryUI.min.js` after you import your JQ libs. But note that there are issue with jQuery and ES6 import (see [1306](https://github.com/gridstack/gridstack.js/issues/1306)).
 
-Note: v2.0.0 does not currently support importing GridStack Drag&Drop without also including our jquery + jqueryui. Still trying to figure how to make that bundle possible. You will have to use 1.x
+NOTE: v2.x / v3.x does not currently support importing GridStack Drag&Drop without also including our jquery + jquery-ui. Still trying to figure how to make that bundle possible. You will have to use 1.x for now...
 
-As for events, you can still use `$(".grid-stack").on(...)` while jqueryui is used internally for things we don't support, but recommended you don't as that will get dropped at some point.
-
+As for events, you can still use `$(".grid-stack").on(...)` for the version that uses jquery-ui for things we don't support.
 
 # Changes
 

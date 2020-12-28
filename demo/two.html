@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="demo.css"/>
   <link rel="stylesheet" href="../dist/gridstack-extra.css"/>
 
-  <script src="../dist/gridstack.all.js"></script>
+  <script src="../dist/gridstack-h5.js"></script>
 
   <style type="text/css">
     .grid-stack-item-removing {
@@ -50,16 +50,14 @@
     <div class="row">
       <div class="col-md-3">
         <div class="sidebar">
-          
           <!-- will size to match content -->
           <div class="grid-stack-item">
             <div class="grid-stack-item-content">Drag me</div>
           </div>
           <!-- manually force a drop size of 2x1 -->
-          <div class="grid-stack-item" data-gs-width="2" data-gs-height="1">
-            <div class="grid-stack-item-content">Drag me 2x1</div>
+          <div class="grid-stack-item" gs-w="2" gs-h="1" gs-max-w="3">
+            <div class="grid-stack-item-content">2x1, max=3</div>
           </div>
-
         </div>
       </div>
       <div class="col-md-9">
@@ -99,11 +97,11 @@
     grids[1].float(true);
 
     let items = [
-      {x: 0, y: 0, width: 2, height: 2},
-      {x: 3, y: 1, width: 1, height: 2},
-      {x: 4, y: 1, width: 1},
-      {x: 2, y: 3, width: 3, maxWidth: 3, id: 'special', content: 'has maxWidth=3'},
-      {x: 2, y: 5, width: 1}
+    {x: 0, y: 0, w: 2, h: 2},
+      {x: 3, y: 1, h: 2},
+      {x: 4, y: 1},
+      {x: 2, y: 3, w: 3, maxW: 3, id: 'special', content: 'has maxW=3'},
+      {x: 2, y: 5}
     ];
 
     grids.forEach(function (grid, i) {

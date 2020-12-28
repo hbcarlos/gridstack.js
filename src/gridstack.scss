@@ -1,5 +1,5 @@
 /*!
- * gridstack 2.1.0 required CSS for default 12 and 1 column Mode size. Use gridstack-extra.css for column [2-11], else see https://github.com/gridstack/gridstack.js#custom-columns-css
+ * gridstack 3.1.2-dev required CSS for default 12 and 1 column Mode size. Use gridstack-extra.css for column [2-11], else see https://github.com/gridstack/gridstack.js#custom-columns-css
  * https://gridstackjs.com/
  * (c) 2014-2020 Alain Dumesny, Dylan Weiss, Pavel Reznikov
  * gridstack.js may be freely distributed under the MIT license.
@@ -65,7 +65,6 @@ $animation_speed: .3s !default;
     &.ui-resizable-resizing {
       z-index: 100;
 
-      > .grid-stack-item-content,
       > .grid-stack-item-content {
         box-shadow: 1px 4px 6px rgba(0, 0, 0, 0.2);
         opacity: 0.8;
@@ -100,19 +99,19 @@ $animation_speed: .3s !default;
     }
 
     @for $i from 1 through $gridstack-columns {
-      &[data-gs-width='#{$i}'] { width: (100% / $gridstack-columns) * $i; }
-      &[data-gs-x='#{$i}'] { left: (100% / $gridstack-columns) * $i; }
-      &[data-gs-min-width='#{$i}'] { min-width: (100% / $gridstack-columns) * $i; }
-      &[data-gs-max-width='#{$i}'] { max-width: (100% / $gridstack-columns) * $i; }
+      &[gs-w='#{$i}'] { width: (100% / $gridstack-columns) * $i; }
+      &[gs-x='#{$i}'] { left: (100% / $gridstack-columns) * $i; }
+      &[gs-min-w='#{$i}'] { min-width: (100% / $gridstack-columns) * $i; }
+      &[gs-max-w='#{$i}'] { max-width: (100% / $gridstack-columns) * $i; }
     }
   }
 
   &.grid-stack-1>.grid-stack-item {
     min-width: 100%;
-    &[data-gs-width='1'] { width: 100%; }
-    &[data-gs-x='1'] { left: 100%; }
-    &[data-gs-min-width='1'] { min-width: 100%; }
-    &[data-gs-max-width='1'] { max-width: 100%; }
+    &[gs-w='1'] { width: 100%; }
+    &[gs-x='1'] { left: 100%; }
+    &[gs-min-w='1'] { min-width: 100%; }
+    &[gs-max-w='1'] { max-width: 100%; }
   }
 
   &.grid-stack-animate,
@@ -124,5 +123,10 @@ $animation_speed: .3s !default;
   &.grid-stack-animate .grid-stack-item.ui-resizable-resizing,
   &.grid-stack-animate .grid-stack-item.grid-stack-placeholder{
     @include vendor(transition, left .0s, top .0s, height .0s, width .0s);
+  }
+
+  // without this, the html5 drag will flicker between no-drop and drop when dragging over second grid
+  &.ui-droppable.ui-droppable-over > *:not(.ui-droppable) {
+    pointer-events: none;
   }
 }

@@ -5,7 +5,10 @@ Change log
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](http://doctoc.herokuapp.com/)*
 
-- [2.2.0-dev](#220-dev)
+- [3.1.2-dev](#312-dev)
+- [3.1.2 (2020-12-7)](#312-2020-12-7)
+- [3.1.0 (2020-12-4)](#310-2020-12-4)
+- [3.0.0 (2020-11-29)](#300-2020-11-29)
 - [2.2.0 (2020-11-7)](#220-2020-11-7)
 - [2.1.0 (2020-10-28)](#210-2020-10-28)
 - [2.0.2 (2020-10-05)](#202-2020-10-05)
@@ -41,10 +44,44 @@ Change log
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-## 2.2.0-dev
+## 3.1.2-dev
 
+- fix [1535](https://github.com/gridstack/gridstack.js/issues/1535) use batchUpdate() around grid init to make sure gs-y attributes are respected.
+
+## 3.1.2 (2020-12-7)
+
+- fix [1419](https://github.com/gridstack/gridstack.js/issues/1419) dragging into a fixed row grid works better (check if it will fit, else try to append, else won't insert)
+-- **possible BREAK** (unlikely you use engine directly)
+* engine constructor takes Options struct rather than spelling arguments (easier to extend/use)
+* `canBePlacedWithRespectToHeight()` -> `willItFit()` like grid method
+
+- fix [1330](https://github.com/gridstack/gridstack.js/issues/1330) `maxW` does not work as intended with resizable handle `"w"`
+- fix [1472](https://github.com/gridstack/gridstack.js/issues/1472) support all options for new dragged in widgets (read all `gs-xyz` attributes)
+- fix [1511](https://github.com/gridstack/gridstack.js/issues/1511) dragging any grid item content works
+- fix [1438](https://github.com/gridstack/gridstack.js/issues/1438) web-component fixes & grid with 0 size initially.
+
+## 3.1.0 (2020-12-4)
+
+- add new `addGrid(parent, opts)` to create a grid and load children instead of `init() + load()`, which is used by `load()` to supports nested grids creation.
+see [nested.html](https://github.com/gridstack/gridstack.js/blob/develop/demo/nested.html) demo.
+- `save()` will now work on nested grids, recursively saving info. added flag to also allow saving the current grid options + children
+(needed for nested grids) so you can now call new `adddGrid()` to re-create everything from JSON.
+- fix [1505](https://github.com/gridstack/gridstack.js/issues/1505) don't call `movable()`/`resizable()` on locked items error. thanks [@infime](https://github.com/infime)
+- fix [1517](https://github.com/gridstack/gridstack.js/pull/1517) force typescript 3.6 as 3.7 has breaking change
+
+## 3.0.0 (2020-11-29)
+
+- the big news is we finally have a native HTML5 drag&drop plugin (zero jquery)! Huge thanks to [@rhlin](https://github.com/rhlin) for creating this in stealth mode. Read all about it in main doc.
 - we now have a React example, in addition to Vue - Angular is next!. thanks [@eloparco](https://github.com/eloparco)
 - fix placeholder not having custom `GridStackOptions.itemClass`. thanks [@pablosichert](https://github.com/pablosichert)
+- fix [1484](https://github.com/gridstack/gridstack.js/issues/1484) dragging between 2 grids and back (regression in 2.0.1) 
+- fix [1471](https://github.com/gridstack/gridstack.js/issues/1471) `load()` into 1 column mode doesn't resize back to 12 correctly
+- fix [1235](https://github.com/gridstack/gridstack.js/issues/1235) `update(el, opts)` re-write to take all `GridStackWidget` options (not just x,y,width,height) and do everything efficiently.
+Hiding `locked()`, `move()`, `resize()`, `minWidth()`, etc... as they just simply call update() which does all the constrain now as well!
+- del `ddPlugin` grid option as we only have one drag&drop plugin at runtime, which is defined by the include you use (HTML5 vs jquery vs none)
+- change attribute `data-gs-min-width` is now `gs-min-w`. We removed 'data-' from all attributes, and shorten 'width|height' to just 'w|h' to require less typing and more efficient (2k saved in .js alone!) [1491](https://github.com/gridstack/gridstack.js/pull/1491) [1492](https://github.com/gridstack/gridstack.js/pull/1492)
+- also `GridStackWidget` used in most API `width|height|minWidth|minHeight|maxWidth|maxHeight` are now shorter `w|h|minW|minH|maxW|maxH` as well [1493](https://github.com/gridstack/gridstack.js/pull/1493)
+- **** see [migrating to v3](https://github.com/gridstack/gridstack.js#migrating-to-v3) ****
 
 ## 2.2.0 (2020-11-7)
 
@@ -191,7 +228,7 @@ thanks [@ermcgrat](https://github.com/ermcgrat) and others for pointing out code
 - fix for griditems with x=0 placement wrong order (introduced by [#1017](https://github.com/gridstack/gridstack.js/issues/10510174)) ([#1054](https://github.com/gridstack/gridstack.js/issues/1054)).
 - fix `cellHeight(val)` not working due to style change (introduced by [#937](https://github.com/gridstack/gridstack.js/issues/937)) ([#1068](https://github.com/gridstack/gridstack.js/issues/1068)).
 - add `gridstack-poly.js` for IE and older browsers, removed `core-js` lib from samples (<1k vs 85k), and all IE8 mentions ([#1061](https://github.com/gridstack/gridstack.js/pull/1061)).
-- add `jquery-ui.js` (and min.js) as minimal subset we need (55k vs 248k), which is now part of `gridstack.all.js`. Include individual parts if you need your own lib instead of all.js
+- add `jquery-ui.js` (and min.js) as minimal subset we need (55k vs 248k), which is now part of `gridstack-h5.js`. Include individual parts if you need your own lib instead of all.js
 ([#1064](https://github.com/gridstack/gridstack.js/pull/1064)).
 - changed jquery dependency to lowest we can use (>=1.8) ([#629](https://github.com/gridstack/gridstack.js/issues/629)).
 - add advance demo from web site ([#1073](https://github.com/gridstack/gridstack.js/pull/1073)).
